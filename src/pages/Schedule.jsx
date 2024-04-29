@@ -2,6 +2,7 @@ import * as React from "react";
 import Header from "../components/Header";
 import Input from "../components/Input";
 import Select from "../components/Select";
+import Slot from "../components/Slot";
 
 const DAYS = [
   "Sunday",
@@ -23,9 +24,15 @@ const Schedule = () => {
       };
     });
   };
-  console.log(formData);
   return (
-    <main>
+    <main
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        flex: 1,
+        alignItems: "center",
+      }}
+    >
       <Header />
       <div
         style={{
@@ -75,13 +82,13 @@ const Schedule = () => {
               width: 150,
               borderRadius: 5,
               alignSelf: "center",
-              marginTop: 45,
+              marginBlock: 50,
             }}
-            // onClick={handleLogout}
           >
             Add
           </button>
         </div>
+        <Slot start={"12:00"} end={"03:35"} day={"Sunday"} />
       </div>
     </main>
   );

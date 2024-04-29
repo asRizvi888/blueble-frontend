@@ -1,10 +1,22 @@
 import * as React from "react";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { login, signup } from "../api/auth";
 import logo from "../assets/blueble.png";
 import Input from "../components/Input";
 
 const Auth = () => {
   const [focused, setFocused] = React.useState("login");
   const [formData, setFormData] = React.useState({});
+
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (localStorage?.getItem("BLUEBLE_TOKEN")) {
+      navigate("/schedule");
+      toast("Welcome back!", { type: "success" });
+    }
+  }, []);
 
   const onChangeText = (e) => {
     setFormData((prev) => {
@@ -17,6 +29,47 @@ const Auth = () => {
 
   const toggleFocused = () => {
     setFocused(focused === "login" ? "signup" : "login");
+  };
+
+  const handleSignup = async () => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!formData?.email || !formData?.password) {
+      return toast("Please fill up all the information", { type: "warning" });
+    }
+
+    if (!regex.test(formData?.email)) {
+      return toast("Please use a valid email", { type: "warning" });
+    }
+
+    signup(formData).then((res) => {
+      if (res?.success) {
+        return toast(res?.message, { type: "success" });
+      }
+      return toast(res?.message, { type: "error" });
+    }).catch((err) => {
+      console.error(err);
+      return toast("Something went wrong", { type: "error" });
+    });
+  };
+
+  const handleLogin = async () => {
+    if (!formData?.email || !formData?.password) {
+      return toast("Please fill up all the information", { type: "warning" });
+    }
+
+    login(formData).then((res) => {
+      if (res?.success) {
+        localStorage.setItem("BLUEBLE_TOKEN", res?.token);
+        navigate("/schedule");
+
+        return toast(res?.message, { type: "success" });
+      }
+      return toast(res?.message, { type: "error" });
+    }).catch((err) => {
+      console.error(err);
+      return toast("Something went wrong", { type: "error" });
+    });
   };
 
   return (
@@ -37,23 +90,24 @@ const Auth = () => {
       <h1 style={{ color: "darkblue" }}>
         {focused === "login" ? "Log in" : "Sign up"}
       </h1>
-
-      <Input
-        type={"text"}
-        lable={"Email"}
-        name={"email"}
-        placeholder={"Enter email here"}
-        value={formData?.email}
-        onChange={onChangeText}
-      />
-      <Input
-        type={"password"}
-        lable={"Password"}
-        name={"password"}
-        placeholder={"Enter password here"}
-        value={formData?.password}
-        onChange={onChangeText}
-      />
+      <form>
+        <Input
+          type={"text"}
+          lable={"Email"}
+          name={"email"}
+          placeholder={"Enter email here"}
+          value={formData?.email}
+          onChange={onChangeText}
+        />
+        <Input
+          type={"password"}
+          lable={"Password"}
+          name={"password"}
+          placeholder={"Enter password here"}
+          value={formData?.password}
+          onChange={onChangeText}
+        />
+      </form>
 
       {focused === "login"
         ? (
@@ -88,6 +142,7 @@ const Auth = () => {
           width: 350,
           borderRadius: 5,
         }}
+        onClick={focused === "login" ? handleLogin : handleSignup}
       >
         {focused === "login" ? "Log in" : "Sign up"}
       </button>
