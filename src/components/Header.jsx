@@ -1,9 +1,22 @@
 import * as React from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import logo from "../assets/blueble.png";
+import { logout } from "../api/auth";
 
 const Header = () => {
-  const handleLogout = () => {
-    // console.log("Logout");
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    logout().then((res) => {
+      if (res?.success) {
+        localStorage.removeItem("BLUEBLE_TOKEN");
+        navigate("/");
+        return toast(res?.message, { type: "success" });
+      }
+      return toast(res?.message, { type: "error" });
+    }).catch((err) => {
+      return toast(err?.message, { type: "error" });
+    });
   };
 
   return (

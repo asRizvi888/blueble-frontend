@@ -12,6 +12,7 @@ const Slot = ({ start, end, day, onEdit, onDelete }) => {
         alignItems: "center",
         justifyContent: "space-between",
         paddingInline: 30,
+        marginBlock: 10,
       }}
     >
       <div>
